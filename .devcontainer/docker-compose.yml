@@ -1,0 +1,29 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ..:/workspace/pdf-invoice:cached
+    env_file:
+      - ../.env
+    environment:
+      # Ensures compose Postgres is used even if .env is incomplete
+      DATABASE_URL: postgresql://pdf_invoice_user:pdf_invoice_password@db:5432/pdf_invoice_db
+    command: sleep infinity
+    depends_on:
+      - db
+
+  db:
+    image: postgres:15
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: pdf_invoice_user
+      POSTGRES_PASSWORD: pdf_invoice_password
+      POSTGRES_DB: pdf_invoice_db
+      POSTGRES_HOST_AUTH_METHOD: trust
+    volumes:
+      - postgres-data-pdf-invoice:/var/lib/postgresql/data
+
+volumes:
+  postgres-data-pdf-invoice:
